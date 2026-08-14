@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAP Đọc Truyện</title>
+  <style>
+    body { font-family: sans-serif; padding: 8px; margin: 0; background: #fff; color: #000; }
+    .btn { display: inline-block; padding: 4px 8px; background: #008000; color: #fff; text-decoration: none; border-radius: 3px; font-weight: bold; }
+    .search-box { margin: 10px 0; }
+    .book-item { padding: 6px 0; border-bottom: 1px solid #ccc; }
+    .book-item a { color: #0000ee; text-decoration: none; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- Thắt lưng Header -->
+  <div>
+    <a href="/" class="btn">🏠 Trang chủ</a>
+  </div>
+
+  <!-- Form Tìm kiếm (Dùng submit form chuẩn, Opera Mini hỗ trợ tốt) -->
+  <div class="search-box">
+    <form action="/" method="GET">
+      <input type="text" name="q" value="<%= query %>" placeholder="Tim ten truyen...">
+      <input type="submit" value="Tim">
+    </form>
+  </div>
+
+  <hr>
+
+  <!-- Danh sách truyện -->
+  <h3>Danh sách truyện</h3>
+  <% if (books.length === 0) { %>
+    <p>Không tìm thấy truyện nào!</p>
+  <% } else { %>
+    <% books.forEach(function(book) { %>
+      <div class="book-item">
+        📖 <a href="/read/<%= book.id %>"><%= book.title %></a>
+      </div>
+    <% }); %>
+  <% } %>
+
+</body>
+</html>

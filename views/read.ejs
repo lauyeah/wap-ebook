@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <style>
+    body { font-family: sans-serif; padding: 8px; margin: 0; background: #fdf6e4; color: #111; line-height: 1.5; }
+    .btn { display: inline-block; padding: 4px 8px; background: #333; color: #fff; text-decoration: none; border-radius: 3px; }
+    .content { background: #fff; padding: 10px; border: 1px solid #ddd; margin: 10px 0; white-space: pre-wrap; font-size: 15px; }
+    .nav-bar { text-align: center; margin: 10px 0; }
+    .nav-bar a { padding: 5px 10px; background: #0070f3; color: #fff; text-decoration: none; margin: 0 4px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation trên -->
+  <div>
+    <a href="/" class="btn">← Về trang chủ</a>
+  </div>
+
+  <h3 style="margin: 8px 0;"><%= title %></h3>
+
+  <!-- Nội dung trang đọc -->
+  <div class="content"><%= text %></div>
+
+  <!-- Phân trang (Trang trước / Trang sau bằng thẻ <a>) -->
+  <div class="nav-bar">
+    <% if (currentPage > 1) { %>
+      <a href="/read/<%= bookId %>?page=<%= currentPage - 1 %>">❮ Trước</a>
+    <% } %>
+
+    <span>[<%= currentPage %> / <%= totalPages %>]</span>
+
+    <% if (currentPage < totalPages) { %>
+      <a href="/read/<%= bookId %>?page=<%= currentPage + 1 %>">Sau ❯</a>
+    <% } %>
+  </div>
+
+</body>
+</html>

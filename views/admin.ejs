@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Upload Truyện</title>
+  <style>
+    body { font-family: sans-serif; padding: 10px; margin: 0; background: #fff; }
+    .btn { display: inline-block; padding: 5px 10px; background: #008000; color: #fff; text-decoration: none; border-radius: 3px; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-weight: bold; margin-bottom: 4px; }
+    input[type="text"], input[type="password"], input[type="file"] { width: 100%; padding: 6px; box-sizing: border-box; }
+    .msg { padding: 8px; margin-bottom: 10px; border-radius: 3px; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+
+  <div>
+    <a href="/" class="btn">🏠 Trang Chủ</a>
+  </div>
+
+  <h2>Admin Upload Truyện (.txt)</h2>
+
+  <% if (message) { %>
+    <div class="msg <%= success ? 'success' : 'error' %>">
+      <%= message %>
+    </div>
+  <% } %>
+
+  <!-- Form thô chuẩn HTML, không cần JavaScript -->
+  <form action="/admin/upload" method="POST" enctype="multipart/form-data">
+    
+    <div class="form-group">
+      <label>Mật khẩu Admin:</label>
+      <input type="password" name="adminPassword" required>
+    </div>
+
+    <div class="form-group">
+      <label>Tên truyện (Slug - viết liền không dấu, VD: dac-nhan-tam):</label>
+      <input type="text" name="bookId" placeholder="dac-nhan-tam" required>
+    </div>
+
+    <div class="form-group">
+      <label>Chọn file .txt (UTF-8):</label>
+      <input type="file" name="file" accept=".txt" required>
+    </div>
+
+    <div class="form-group">
+      <input type="submit" value="Upload Truyện Up Server" style="padding: 8px 16px; background: #0070f3; color: white; border: none; font-weight: bold;">
+    </div>
+
+  </form>
+
+</body>
+</html>
