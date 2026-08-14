@@ -1,5 +1,10 @@
-require('dotenv').config();
-
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    require('dotenv').config();
+  } catch (e) {
+    // Bỏ qua nếu không có dotenv trên Vercel
+  }
+}
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
