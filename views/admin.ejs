@@ -50,22 +50,26 @@
     </form>
   </div>
 
-  <!-- CHỨC NĂNG 2: DANH SÁCH & THAO TÁC TRUYỆN (XÓA / SỬA TẠI CHỖ) -->
+  <!-- CHỨC NĂNG 2: DANH SÁCH & THAO TÁC TRUYỆN -->
   <button class="collapsible">2. Quản Lý Danh Sách Truyện (<%= typeof totalBooks !== 'undefined' ? totalBooks : 0 %>)</button>
-  <div class="collapsible-content card" style="display: block;"> <!-- Mặc định mở phần này -->
+  <div class="collapsible-content card" style="display: block;">
     <% if (typeof books === 'undefined' || books.length === 0) { %>
       <p>Chưa có truyện nào.</p>
     <% } else { %>
-      <form action="/admin/delete-multiple" method="POST" onsubmit="return confirm('Xác nhận xóa các truyện đã chọn?');">
+      
+      <!-- FORM XÓA TRUYỆN -->
+      <form action="/admin/delete-multiple" method="POST" onsubmit="return confirmDelete();">
         <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-          <input type="password" name="adminPassword" placeholder="MK Admin để xóa" style="width: 180px; font-size: 18px;" required>
+          <input type="password" name="adminPassword" id="deleteAdminPassword" placeholder="MK Admin để xóa" style="width: 180px; font-size: 18px;" required>
           <button type="submit" class="btn btn-danger">Xóa các mục đã chọn</button>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th style="width: 30px;"><input type="checkbox" class="checkbox-large" onclick="var c=document.querySelectorAll('.cb');for(var i=0;i<c.length;i++)c[i].checked=this.checked;"></th>
+              <th style="width: 30px;">
+                <input type="checkbox" class="checkbox-large" onclick="var c=document.querySelectorAll('.cb');for(var i=0;i<c.length;i++)c[i].checked=this.checked;">
+              </th>
               <th>Tên Truyện</th>
               <th>Mã (Slug)</th>
               <th style="width: 90px; text-align: center;">Hành động</th>
@@ -73,9 +77,11 @@
           </thead>
           <tbody>
             <% books.forEach(function(book) { %>
-              <!-- Hàng hiển thị thông tin truyện -->
+              <!-- Hàng hiển thị thông tin -->
               <tr>
-                <td><input type="checkbox" name="bookIds" value="<%= book.id %>" class="cb checkbox-large"></td>
+                <td>
+                  <input type="checkbox" name="bookIds" value="<%= book.id %>" class="cb checkbox-large">
+                </td>
                 <td><strong><%= book.title %></strong></td>
                 <td><code><%= book.id %></code></td>
                 <td style="text-align: center;">
@@ -83,32 +89,29 @@
                 </td>
               </tr>
 
-              <!-- Hàng ẩn để SỬA thông tin trực tiếp -->
+              <!-- Hàng ẩn để SỬA thông tin (đã đưa ra khỏi phụ thuộc của Form Xóa) -->
               <tr id="edit-row-<%= book.id %>" style="display: none; background: rgba(255, 255, 255, 0.05);">
                 <td colspan="4" style="padding: 12px 15px;">
                   <div style="font-weight: bold; margin-bottom: 8px; color: #f57c00;">[ Chỉnh sửa: <%= book.title %> ]</div>
-                  <div class="edit-form-inline">
-                    <input type="hidden" name="oldBookId_form" value="<%= book.id %>">
-                    
-                    <div style="margin-bottom: 8px;">
-                      <label style="font-size: 16px; margin-bottom: 2px;">Tên hiển thị mới:</label>
-                      <input type="text" id="title-<%= book.id %>" value="<%= book.title %>" style="width: 95%; font-size: 18px; padding: 6px;" required>
-                    </div>
+                  
+                  <div style="margin-bottom: 8px;">
+                    <label style="font-size: 16px; margin-bottom: 2px;">Tên hiển thị mới:</label>
+                    <input type="text" id="title-<%= book.id %>" value="<%= book.title %>" style="width: 95%; font-size: 18px; padding: 6px;" required>
+                  </div>
 
-                    <div style="margin-bottom: 8px;">
-                      <label style="font-size: 16px; margin-bottom: 2px;">Mã (Slug) mới (để trống nếu giữ nguyên):</label>
-                      <input type="text" id="slug-<%= book.id %>" value="<%= book.id %>" style="width: 95%; font-size: 18px; padding: 6px;">
-                    </div>
+                  <div style="margin-bottom: 8px;">
+                    <label style="font-size: 16px; margin-bottom: 2px;">Mã (Slug) mới (để trống nếu giữ nguyên):</label>
+                    <input type="text" id="slug-<%= book.id %>" value="<%= book.id %>" style="width: 95%; font-size: 18px; padding: 6px;">
+                  </div>
 
-                    <div style="margin-bottom: 8px;">
-                      <label style="font-size: 16px; margin-bottom: 2px;">Mật khẩu Admin:</label>
-                      <input type="password" id="pass-<%= book.id %>" placeholder="Nhập MK Admin để lưu" style="width: 95%; font-size: 18px; padding: 6px;" required>
-                    </div>
+                  <div style="margin-bottom: 8px;">
+                    <label style="font-size: 16px; margin-bottom: 2px;">Mật khẩu Admin:</label>
+                    <input type="password" id="pass-<%= book.id %>" placeholder="Nhập MK Admin để lưu" style="width: 95%; font-size: 18px; padding: 6px;" required>
+                  </div>
 
-                    <div style="margin-top: 10px;">
-                      <button type="button" class="btn btn-warning" style="font-size: 16px; padding: 6px 14px;" onclick="submitUpdate('<%= book.id %>')">Lưu cập nhật</button>
-                      <button type="button" class="btn btn-secondary" style="font-size: 16px; padding: 6px 14px;" onclick="toggleEditRow('<%= book.id %>')">Hủy</button>
-                    </div>
+                  <div style="margin-top: 10px;">
+                    <button type="button" class="btn btn-warning" style="font-size: 16px; padding: 6px 14px;" onclick="submitUpdate('<%= book.id %>')">Lưu cập nhật</button>
+                    <button type="button" class="btn btn-secondary" style="font-size: 16px; padding: 6px 14px;" onclick="toggleEditRow('<%= book.id %>')">Hủy</button>
                   </div>
                 </td>
               </tr>
@@ -117,7 +120,7 @@
         </table>
       </form>
 
-      <!-- Form ẩn dùng chung để gửi yêu cầu Cập nhật qua POST -->
+      <!-- Form ẩn phục vụ Cập nhật truyện -->
       <form id="hiddenUpdateForm" action="/admin/update" method="POST" style="display: none;">
         <input type="hidden" name="oldBookId" id="formOldBookId">
         <input type="hidden" name="newDisplayTitle" id="formNewDisplayTitle">
@@ -125,7 +128,7 @@
         <input type="hidden" name="adminPassword" id="formAdminPassword">
       </form>
 
-      <!-- Phân trang & Jump to page trong Admin -->
+      <!-- Phân trang -->
       <% if (totalPages > 1) { %>
         <div class="pagination">
           <% if (currentPage > 1) { %>
@@ -149,9 +152,8 @@
     <% } %>
   </div>
 
-  <!-- JavaScript xử lý Đóng/Mở & Submit form sửa trực tiếp -->
   <script>
-    // Xử lý đóng mở chức năng (Accordion)
+    // Accordion Đóng/Mở
     var coll = document.getElementsByClassName("collapsible");
     for (var i = 0; i < coll.length; i++) {
       coll[i].addEventListener("click", function() {
@@ -165,7 +167,17 @@
       });
     }
 
-    // Ẩn/Hiện hàng sửa truyện
+    // Kiểm tra trước khi xóa
+    function confirmDelete() {
+      var checkboxes = document.querySelectorAll('.cb:checked');
+      if (checkboxes.length === 0) {
+        alert('Vui lòng chọn ít nhất một truyện để xóa!');
+        return false;
+      }
+      return confirm('Xác nhận xóa ' + checkboxes.length + ' truyện đã chọn?');
+    }
+
+    // Toggle hiển thị form sửa
     function toggleEditRow(bookId) {
       var row = document.getElementById("edit-row-" + bookId);
       if (row.style.display === "none" || row.style.display === "") {
@@ -175,7 +187,7 @@
       }
     }
 
-    // Gửi form cập nhật dữ liệu
+    // Submit form sửa
     function submitUpdate(bookId) {
       var newTitle = document.getElementById("title-" + bookId).value;
       var newSlug = document.getElementById("slug-" + bookId).value;
