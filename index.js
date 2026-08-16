@@ -8,16 +8,21 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const cookieParser = require('cookie-parser');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 app.set('views', path.resolve(process.cwd(), 'views'));
 app.use(express.static(path.resolve(process.cwd(), 'public')));
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Cho phép dùng các file trong thư mục public (CSS, JS, hình ảnh...)
+app.use(express.static('public'));
 
 // Biến môi trường
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "123456";
@@ -30,6 +35,17 @@ const BOOKS_DIR = path.resolve(process.cwd(), 'public/books');
 // Cấu hình giới hạn
 const BASE_CHARS_PER_PAGE = 4000;
 const BOOKS_PER_PAGE = 10;
+
+// Middleware xử lý Theme (Lưu cookie để tương thích Opera Mini)
+app.use((req, res, next) => {
+  if (req.query.theme) {
+    res.cookie('theme', req.query.theme, { maxAge: 365 * 24 * 60 * 60 * 1000 });
+    res.locals.theme = req.query.theme;
+  } else {
+    res.locals.theme = req.cookies.theme || 'dark';
+  }
+  next();
+});
 
 // Hàm tạo slug từ tên truyện (Tự động sinh mã truyện)
 function createSlug(str) {
@@ -45,7 +61,7 @@ function createSlug(str) {
     .replace(/^-+|-+$/g, '');
 }
 
-// Hàm loại bỏ dấu tiếng Việt phục vụ tìm kiếm không dấu
+// Hàm loại bỏ dấu tiếng Việt
 function removeVietnameseTones(str) {
   if (!str) return '';
   return str
@@ -56,7 +72,7 @@ function removeVietnameseTones(str) {
     .trim();
 }
 
-// Hàm lấy tất cả danh sách truyện (Từ Supabase hoặc Thư mục Local)
+// Hàm lấy tất cả danh sách truyện
 async function getAllBooks() {
   let books = [];
 
@@ -103,7 +119,7 @@ async function getAllBooks() {
   return books;
 }
 
-// Thuật toán ngắt trang thông minh (Ưu tiên Dấu chấm -> Dấu phẩy -> Khoảng trắng)
+// Thuật toán ngắt trang thông minh
 function paginateTextSmart(content, targetPage) {
   const pages = [];
   let currentIndex = 0;
@@ -159,8 +175,8 @@ function paginateTextSmart(content, targetPage) {
   return { pageText, totalPages, currentPage };
 }
 
-// Helper render trang Admin kèm phân trang dữ liệu
-async function renderAdminWithData(res, message, success, page = 1) {
+// Helper render trang Admin
+async function renderAdminWithData(req, res, message, success, page = 1) {
   const allBooks = await getAllBooks();
   const totalBooks = allBooks.length;
   const totalPages = Math.ceil(totalBooks / BOOKS_PER_PAGE) || 1;
@@ -174,13 +190,14 @@ async function renderAdminWithData(res, message, success, page = 1) {
     books: paginatedBooks,
     totalBooks,
     currentPage,
-    totalPages
+    totalPages,
+    currentUrl: req.originalUrl.split('?')[0]
   });
 }
 
-// ------------------- DEFINITION ROUTES -------------------
+// ------------------- ROUTES -------------------
 
-// 1. Trang Chủ - Tìm kiếm & Phân trang
+// 1. Trang Chủ
 app.get('/', async (req, res) => {
   const query = req.query.q || '';
   const page = parseInt(req.query.page) || 1;
@@ -204,7 +221,8 @@ app.get('/', async (req, res) => {
     books: paginatedBooks,
     query,
     currentPage,
-    totalPages
+    totalPages,
+    currentUrl: req.originalUrl.split('?')[0]
   });
 });
 
@@ -240,30 +258,30 @@ app.get('/read/:id', async (req, res) => {
     bookId,
     text: pageText,
     currentPage,
-    totalPages
+    totalPages,
+    currentUrl: req.originalUrl.split('?')[0]
   });
 });
 
-// 3. Trang Admin Dashboard
+// 3. Trang Admin
 app.get('/admin', async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  await renderAdminWithData(res, null, false, page);
+  await renderAdminWithData(req, res, null, false, page);
 });
 
-// 4. Admin - Upload Truyện Mới (Tự động sinh mã truyện từ Tên truyện)
+// 4. Admin - Tải Lên Truyện
 app.post('/admin/upload', upload.single('file'), async (req, res) => {
   const { adminPassword, displayTitle } = req.body;
   const file = req.file;
 
   if (adminPassword !== ADMIN_PASSWORD) {
-    return await renderAdminWithData(res, 'Mật khẩu Admin không chính xác!', false);
+    return await renderAdminWithData(req, res, 'Mật khẩu Admin không chính xác!', false);
   }
 
   if (!file || !displayTitle) {
-    return await renderAdminWithData(res, 'Vui lòng nhập đầy đủ thông tin!', false);
+    return await renderAdminWithData(req, res, 'Vui lòng nhập đầy đủ thông tin!', false);
   }
 
-  // Tự động tạo mã truyện dạng slug
   const cleanBookId = createSlug(displayTitle) || `book-${Date.now()}`;
   const fileName = `${cleanBookId}.txt`;
 
@@ -299,25 +317,24 @@ app.post('/admin/upload', upload.single('file'), async (req, res) => {
       fs.writeFileSync(metaPath, JSON.stringify(titlesMap, null, 2));
     }
 
-    await renderAdminWithData(res, `Tải lên thành công truyện: "${displayTitle}" (Mã: ${cleanBookId})`, true);
+    await renderAdminWithData(req, res, `Tải lên thành công: "${displayTitle}" (Mã: ${cleanBookId})`, true);
   } catch (err) {
-    await renderAdminWithData(res, `Lỗi tải lên: ${err.message}`, false);
+    await renderAdminWithData(req, res, `Lỗi tải lên: ${err.message}`, false);
   }
 });
 
-// 5. Admin - Cập nhật/Chỉnh sửa Tên truyện & Mã truyện
+// 5. Admin - Cập Nhật Truyện
 app.post('/admin/update', async (req, res) => {
   const { adminPassword, oldBookId, newBookId, newDisplayTitle } = req.body;
 
   if (adminPassword !== ADMIN_PASSWORD) {
-    return await renderAdminWithData(res, 'Mật khẩu Admin không chính xác!', false);
+    return await renderAdminWithData(req, res, 'Mật khẩu Admin không chính xác!', false);
   }
 
   if (!oldBookId || !newDisplayTitle) {
-    return await renderAdminWithData(res, 'Thông tin không hợp lệ!', false);
+    return await renderAdminWithData(req, res, 'Thông tin không hợp lệ!', false);
   }
 
-  // Nếu người dùng không nhập mã mới, tự tạo slug theo tên mới
   const targetBookId = (newBookId && newBookId.trim()) 
     ? createSlug(newBookId) 
     : createSlug(newDisplayTitle);
@@ -330,19 +347,16 @@ app.post('/admin/update', async (req, res) => {
         if (metaData) titlesMap = JSON.parse(await metaData.text());
       } catch (e) {}
 
-      // Nếu có đổi mã truyện, cần đổi tên file .txt tương ứng trên Supabase
       if (oldBookId !== targetBookId) {
         const { data: fileData, error: downloadErr } = await supabase.storage.from('books').download(`${oldBookId}.txt`);
         if (!downloadErr && fileData) {
           const contentBuffer = Buffer.from(await fileData.arrayBuffer());
           
-          // Upload file mới với mã mới
           await supabase.storage.from('books').upload(`${targetBookId}.txt`, contentBuffer, {
             contentType: 'text/plain; charset=utf-8',
             upsert: true
           });
           
-          // Xóa file cũ
           await supabase.storage.from('books').remove([`${oldBookId}.txt`]);
         }
         delete titlesMap[oldBookId];
@@ -356,7 +370,6 @@ app.post('/admin/update', async (req, res) => {
       });
 
     } else {
-      // Đổi tên file ở Local
       const oldFilePath = path.join(BOOKS_DIR, `${oldBookId}.txt`);
       const newFilePath = path.join(BOOKS_DIR, `${targetBookId}.txt`);
 
@@ -378,24 +391,24 @@ app.post('/admin/update', async (req, res) => {
       fs.writeFileSync(metaPath, JSON.stringify(titlesMap, null, 2));
     }
 
-    await renderAdminWithData(res, `Đã cập nhật thành công truyện!`, true);
+    await renderAdminWithData(req, res, `Đã cập nhật thành công!`, true);
   } catch (err) {
-    await renderAdminWithData(res, `Lỗi khi cập nhật: ${err.message}`, false);
+    await renderAdminWithData(req, res, `Lỗi cập nhật: ${err.message}`, false);
   }
 });
 
-// 6. Admin - Xóa Nhiều Truyện Cùng Lúc (Bulk Delete)
+// 6. Admin - Xóa Nhiều Truyện
 app.post('/admin/delete-multiple', async (req, res) => {
   const { adminPassword, bookIds } = req.body;
 
   if (adminPassword !== ADMIN_PASSWORD) {
-    return await renderAdminWithData(res, 'Mật khẩu Admin không chính xác!', false);
+    return await renderAdminWithData(req, res, 'Mật khẩu Admin không chính xác!', false);
   }
 
   const idsToDelete = Array.isArray(bookIds) ? bookIds : (bookIds ? [bookIds] : []);
 
   if (idsToDelete.length === 0) {
-    return await renderAdminWithData(res, 'Vui lòng chọn ít nhất 1 truyện để xóa!', false);
+    return await renderAdminWithData(req, res, 'Vui lòng chọn ít nhất 1 truyện để xóa!', false);
   }
 
   try {
@@ -433,14 +446,13 @@ app.post('/admin/delete-multiple', async (req, res) => {
       }
     }
 
-    await renderAdminWithData(res, `Đã xóa thành công ${idsToDelete.length} truyện!`, true);
+    await renderAdminWithData(req, res, `Đã xóa thành công ${idsToDelete.length} truyện!`, true);
   } catch (err) {
-    await renderAdminWithData(res, `Lỗi khi xóa: ${err.message}`, false);
+    await renderAdminWithData(req, res, `Lỗi khi xóa: ${err.message}`, false);
   }
 });
 
-// Khởi chạy Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server đang chạy tại: http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
 
 module.exports = app;

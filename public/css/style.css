@@ -1,0 +1,167 @@
+/* ==========================================
+   1. THEME SÁNG / TỐI (COLOR SCHEMES)
+   ========================================== */
+body.theme-light {
+  background: #ffffff;
+  color: #222222;
+}
+body.theme-light a {
+  color: #1565c0;
+}
+body.theme-light .card {
+  background: #f9f9f9;
+  border-color: #dddddd;
+}
+body.theme-light .btn {
+  background: #1e88e5;
+  color: #ffffff;
+}
+body.theme-light .collapsible {
+  background: #e3f2fd;
+  color: #0d47a1;
+  border: 1px solid #bbdefb;
+}
+
+body.theme-dark {
+  background: #121212;
+  color: #e0e0e0;
+}
+body.theme-dark a {
+  color: #64b5f6;
+}
+body.theme-dark .card {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+}
+body.theme-dark .btn {
+  background: #1e88e5;
+  color: #ffffff;
+}
+body.theme-dark .collapsible {
+  background: #263238;
+  color: #81d4fa;
+  border: 1px solid #37474f;
+}
+
+/* ==========================================
+   2. CẤU TRÚC & CỠ CHỮ CHUNG
+   ========================================== */
+body {
+  font-family: sans-serif;
+  padding: 12px;
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.6;
+}
+
+.reader-body {
+  font-family: serif;
+  font-size: 26px;
+  line-height: 1.8;
+}
+
+/* Header & Buttons */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-family: sans-serif;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 16px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+  font-family: sans-serif;
+}
+
+.btn-secondary { background: #555 !important; color: #fff !important; }
+.btn-dark-toggle { background: #333 !important; color: #fff !important; }
+.btn-warning { background: #f57c00 !important; color: #fff !important; }
+.btn-danger { background: #b71c1c !important; color: #fff !important; }
+.btn-large { padding: 12px 24px; font-size: 22px; }
+.btn-full { width: 100%; padding: 12px; font-size: 22px; }
+
+/* Jump Page Form */
+.jump-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.jump-input {
+  width: 70px;
+  padding: 6px 8px;
+  font-size: 19px;
+  text-align: center;
+  border-radius: 4px;
+  border: 1px solid #666;
+  background: inherit;
+  color: inherit;
+}
+
+/* Collapsible Section (Dành cho Admin) */
+.collapsible {
+  cursor: pointer;
+  padding: 14px 18px;
+  width: 100%;
+  text-align: left;
+  outline: none;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 6px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.collapsible:after {
+  content: '\02795'; /* Dấu cộng (+) */
+  font-size: 18px;
+}
+
+.active.collapsible:after {
+  content: "\2796"; /* Dấu trừ (-) */
+}
+
+.collapsible-content {
+  padding: 15px;
+  display: none;
+  overflow: hidden;
+  border-radius: 0 0 6px 6px;
+  margin-bottom: 15px;
+}
+
+/* Các thành phần khác */
+.search-box { margin: 15px 0; }
+.input-text { padding: 10px; border: 1px solid #777; border-radius: 6px; background: inherit; color: inherit; font-size: 20px; }
+.book-item { padding: 12px 0; border-bottom: 1px solid #444; }
+.book-item a { text-decoration: none; font-weight: bold; font-size: 24px; }
+.pagination { text-align: center; margin: 20px 0; font-size: 21px; font-family: sans-serif; }
+.pagination a { padding: 8px 16px; margin: 0 4px; }
+h2 { font-size: 30px; }
+h3 { font-size: 27px; margin: 15px 0; }
+h4 { font-size: 22px; }
+hr { border: 0; border-top: 1px solid #444; }
+.title { font-size: 30px; margin: 15px 0 8px 0; font-family: sans-serif; }
+.page-info { font-size: 20px; color: #888; margin-bottom: 12px; font-family: sans-serif; }
+.content { white-space: pre-wrap; word-wrap: break-word; margin-bottom: 20px; }
+.bottom-home { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px dashed #555; font-family: sans-serif; }
+.msg { padding: 12px; margin-bottom: 15px; border-radius: 6px; font-weight: bold; font-size: 20px; }
+.msg.success { background: #1b5e20; color: #fff; }
+.msg.error { background: #b71c1c; color: #fff; }
+.card { border: 1px solid #444; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
+.form-group { margin-bottom: 15px; }
+label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 20px; }
+input[type="text"], input[type="password"], input[type="file"] { width: 95%; padding: 10px; background: inherit; color: inherit; border: 1px solid #666; border-radius: 6px; font-size: 20px; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { border-bottom: 1px solid #444; padding: 10px 6px; text-align: left; font-size: 19px; }
+.checkbox-large { transform: scale(1.5); }

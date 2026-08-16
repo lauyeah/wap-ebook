@@ -4,84 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản Trị Hệ Thống</title>
-  <style>
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #222222;
-      --card-bg: #f9f9f9;
-      --border-color: #dddddd;
-      --btn-bg: #1e88e5;
-      --btn-text: #ffffff;
-      --title-color: #6a1b9a;
-      --subtext: #666666;
-      --danger: #cf6679;
-      --warning: #f57c00;
-    }
-
-    [data-theme="dark"] {
-      --bg-color: #121212;
-      --text-color: #e0e0e0;
-      --card-bg: #1e1e1e;
-      --border-color: #2a2a2a;
-      --btn-bg: #1e88e5;
-      --btn-text: #ffffff;
-      --title-color: #bb86fc;
-      --subtext: #aaaaaa;
-      --danger: #cf6679;
-      --warning: #ffb74d;
-    }
-
-    body { font-family: sans-serif; padding: 10px; margin: 0; background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; }
-    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .btn { display: inline-block; padding: 6px 12px; background: var(--card-bg); color: var(--text-color); text-decoration: none; border-radius: 4px; font-weight: bold; border: 1px solid var(--border-color); cursor: pointer; }
-    .btn-primary { background: var(--btn-bg); color: var(--btn-text); border: none; }
-    .btn-danger { background: var(--danger); color: #000; border: none; }
-    .btn-warning { background: var(--warning); color: #000; border: none; padding: 4px 8px; font-size: 13px; }
-    .theme-toggle { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-    
-    .msg { padding: 10px; margin-bottom: 12px; border-radius: 4px; font-weight: bold; }
-    .success { background: #1b5e20; color: #e8f5e9; }
-    .error { background: #b71c1c; color: #ffebee; }
-
-    /* Dashboard Grid */
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 15px; }
-    .menu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; text-align: center; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
-    .menu-card:hover { transform: translateY(-3px); border-color: var(--title-color); }
-    .menu-card h3 { margin: 0 0 8px 0; color: var(--title-color); }
-    .menu-card p { margin: 0; color: var(--subtext); font-size: 13px; }
-
-    /* Action Panels */
-    .panel { display: none; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 15px; margin-top: 15px; }
-    .panel.active { display: block; }
-    
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-weight: bold; margin-bottom: 4px; color: var(--title-color); }
-    input[type="text"], input[type="password"], input[type="file"] { width: 100%; padding: 8px; box-sizing: border-box; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; }
-
-    /* Table Styles */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border-bottom: 1px solid var(--border-color); padding: 10px 6px; text-align: left; }
-    th { color: var(--title-color); background: var(--bg-color); }
-    
-    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
-    .jump-input { width: 45px; padding: 4px; text-align: center; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; }
-
-    /* Modal Sửa Truyện */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; }
-  </style>
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-    })();
-  </script>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="theme-<%= theme %>">
 
   <div class="header-bar">
-    <a href="/" class="btn">← [Về Trang Chủ]</a>
-    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙 Tối</button>
+    <a href="/" class="btn">[Về Trang Chủ]</a>
+    <% if (theme === 'dark') { %>
+      <a href="?theme=light" class="btn btn-secondary">[Chế độ Sáng]</a>
+    <% } else { %>
+      <a href="?theme=dark" class="btn btn-dark-toggle">[Chế độ Tối]</a>
+    <% } %>
   </div>
 
   <h2>Quản Trị Hệ Thống</h2>
@@ -92,26 +25,9 @@
     </div>
   <% } %>
 
-  <!-- 1. MAN HINH CHINH (MENU) -->
-  <div id="lobbyMenu">
-    <p style="color: var(--subtext);">Chọn một chức năng để bắt đầu quản trị:</p>
-    <div class="menu-grid">
-      <div class="menu-card" onclick="openPanel('uploadPanel')">
-        <h3>➕ Thêm Truyện</h3>
-        <p>Tải file truyện .txt mới lên hệ thống</p>
-      </div>
-      <div class="menu-card" onclick="openPanel('listPanel')">
-        <h3>📚 Danh Sách Truyện</h3>
-        <p>Xem, quản lý, sửa và xóa truyện</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2. CHUC NANG: THEM TRUYEN -->
-  <div id="uploadPanel" class="panel">
-    <button class="btn" onclick="showLobby()" style="margin-bottom: 12px;">← Quay lại Bảng điều khiển</button>
-    <h3 style="color: var(--title-color); margin-top: 0;">Thêm Truyện Mới</h3>
-    
+  <!-- CHỨC NĂNG 1: THÊM TRUYỆN MỚI -->
+  <button class="collapsible">1. Thêm Truyện Mới</button>
+  <div class="collapsible-content card">
     <form action="/admin/upload" method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label>Mật khẩu Admin:</label>
@@ -121,55 +37,79 @@
       <div class="form-group">
         <label>Tên truyện hiển thị:</label>
         <input type="text" name="displayTitle" placeholder="Ví dụ: Đắc Nhân Tâm" required>
-        <span style="font-size: 12px; color: var(--subtext);">Mã truyện (slug) sẽ tự động sinh dựa trên tên truyện.</span>
       </div>
 
       <div class="form-group">
-        <label>Chọn file truyện (.txt UTF-8):</label>
+        <label>Chọn file (.txt):</label>
         <input type="file" name="file" accept=".txt" required>
       </div>
 
-      <div class="form-group" style="margin-top: 15px;">
-        <input type="submit" value="Tải truyện lên" class="btn btn-primary" style="width: 100%; padding: 10px; cursor: pointer;">
+      <div class="form-group">
+        <input type="submit" value="Tải lên" class="btn btn-full">
       </div>
     </form>
   </div>
 
-  <!-- 3. CHUC NANG: DANH SACH & SUA/XOA TRUYEN -->
-  <div id="listPanel" class="panel">
-    <button class="btn" onclick="showLobby()" style="margin-bottom: 12px;">← Quay lại Bảng điều khiển</button>
-    <h3 style="color: var(--title-color); margin-top: 0;">Danh Sách Truyện (<%= typeof totalBooks !== 'undefined' ? totalBooks : (typeof books !== 'undefined' ? books.length : 0) %>)</h3>
-
+  <!-- CHỨC NĂNG 2: DANH SÁCH & THAO TÁC TRUYỆN (XÓA / SỬA TẠI CHỖ) -->
+  <button class="collapsible">2. Quản Lý Danh Sách Truyện (<%= typeof totalBooks !== 'undefined' ? totalBooks : 0 %>)</button>
+  <div class="collapsible-content card" style="display: block;"> <!-- Mặc định mở phần này -->
     <% if (typeof books === 'undefined' || books.length === 0) { %>
-      <p style="color: var(--subtext);">Chưa có truyện nào trong cơ sở dữ liệu.</p>
+      <p>Chưa có truyện nào.</p>
     <% } else { %>
-      <form action="/admin/delete-multiple" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa các truyện đã chọn?');">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <div>
-            <input type="password" name="adminPassword" placeholder="Mật khẩu Admin" style="width: 130px; padding: 6px; inline-size: auto;" required>
-            <button type="submit" class="btn btn-danger">Xóa đã chọn</button>
-          </div>
-          <span style="font-size: 13px; color: var(--subtext);">Trang <%= currentPage %> / <%= totalPages %></span>
+      <form action="/admin/delete-multiple" method="POST" onsubmit="return confirm('Xác nhận xóa các truyện đã chọn?');">
+        <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+          <input type="password" name="adminPassword" placeholder="MK Admin để xóa" style="width: 180px; font-size: 18px;" required>
+          <button type="submit" class="btn btn-danger">Xóa các mục đã chọn</button>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th style="width: 30px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+              <th style="width: 30px;"><input type="checkbox" class="checkbox-large" onclick="var c=document.querySelectorAll('.cb');for(var i=0;i<c.length;i++)c[i].checked=this.checked;"></th>
               <th>Tên Truyện</th>
               <th>Mã (Slug)</th>
-              <th style="width: 60px; text-align: center;">Sửa</th>
+              <th style="width: 90px; text-align: center;">Hành động</th>
             </tr>
           </thead>
           <tbody>
             <% books.forEach(function(book) { %>
+              <!-- Hàng hiển thị thông tin truyện -->
               <tr>
-                <td><input type="checkbox" name="bookIds" value="<%= book.id %>" class="book-checkbox"></td>
+                <td><input type="checkbox" name="bookIds" value="<%= book.id %>" class="cb checkbox-large"></td>
                 <td><strong><%= book.title %></strong></td>
                 <td><code><%= book.id %></code></td>
                 <td style="text-align: center;">
-                  <button type="button" class="btn btn-warning" data-id="<%= book.id %>" data-title="<%= book.title %>" onclick="openEditModalFromBtn(this)">✏️ Sửa</button>
+                  <button type="button" class="btn btn-warning" style="padding: 4px 10px; font-size: 16px;" onclick="toggleEditRow('<%= book.id %>')">Sửa</button>
+                </td>
+              </tr>
+
+              <!-- Hàng ẩn để SỬA thông tin trực tiếp -->
+              <tr id="edit-row-<%= book.id %>" style="display: none; background: rgba(255, 255, 255, 0.05);">
+                <td colspan="4" style="padding: 12px 15px;">
+                  <div style="font-weight: bold; margin-bottom: 8px; color: #f57c00;">[ Chỉnh sửa: <%= book.title %> ]</div>
+                  <div class="edit-form-inline">
+                    <input type="hidden" name="oldBookId_form" value="<%= book.id %>">
+                    
+                    <div style="margin-bottom: 8px;">
+                      <label style="font-size: 16px; margin-bottom: 2px;">Tên hiển thị mới:</label>
+                      <input type="text" id="title-<%= book.id %>" value="<%= book.title %>" style="width: 95%; font-size: 18px; padding: 6px;" required>
+                    </div>
+
+                    <div style="margin-bottom: 8px;">
+                      <label style="font-size: 16px; margin-bottom: 2px;">Mã (Slug) mới (để trống nếu giữ nguyên):</label>
+                      <input type="text" id="slug-<%= book.id %>" value="<%= book.id %>" style="width: 95%; font-size: 18px; padding: 6px;">
+                    </div>
+
+                    <div style="margin-bottom: 8px;">
+                      <label style="font-size: 16px; margin-bottom: 2px;">Mật khẩu Admin:</label>
+                      <input type="password" id="pass-<%= book.id %>" placeholder="Nhập MK Admin để lưu" style="width: 95%; font-size: 18px; padding: 6px;" required>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                      <button type="button" class="btn btn-warning" style="font-size: 16px; padding: 6px 14px;" onclick="submitUpdate('<%= book.id %>')">Lưu cập nhật</button>
+                      <button type="button" class="btn btn-secondary" style="font-size: 16px; padding: 6px 14px;" onclick="toggleEditRow('<%= book.id %>')">Hủy</button>
+                    </div>
+                  </div>
                 </td>
               </tr>
             <% }); %>
@@ -177,125 +117,86 @@
         </table>
       </form>
 
-      <!-- Phân trang Admin -->
+      <!-- Form ẩn dùng chung để gửi yêu cầu Cập nhật qua POST -->
+      <form id="hiddenUpdateForm" action="/admin/update" method="POST" style="display: none;">
+        <input type="hidden" name="oldBookId" id="formOldBookId">
+        <input type="hidden" name="newDisplayTitle" id="formNewDisplayTitle">
+        <input type="hidden" name="newBookId" id="formNewBookId">
+        <input type="hidden" name="adminPassword" id="formAdminPassword">
+      </form>
+
+      <!-- Phân trang & Jump to page trong Admin -->
       <% if (totalPages > 1) { %>
         <div class="pagination">
           <% if (currentPage > 1) { %>
-            <a href="javascript:void(0)" onclick="goToAdminPage(<%= currentPage - 1 %>)" class="btn">❮ Trước</a>
+            <a href="/admin?page=<%= currentPage - 1 %>" class="btn">&lt; Trước</a>
           <% } %>
 
-          <span style="color: var(--subtext);">[Trang <%= currentPage %> / <%= totalPages %>]</span>
+          <span>[Trang <%= currentPage %> / <%= totalPages %>]</span>
 
           <% if (currentPage < totalPages) { %>
-            <a href="javascript:void(0)" onclick="goToAdminPage(<%= currentPage + 1 %>)" class="btn">Sau ❯</a>
+            <a href="/admin?page=<%= currentPage + 1 %>" class="btn">Sau &gt;</a>
           <% } %>
 
-          <form action="/admin" method="GET" style="display: inline-block; margin-left: 5px;">
-            <input type="hidden" name="panel" value="listPanel">
+          <br>
+          <form action="/admin" method="GET" class="jump-box">
+            <span>Đến trang:</span>
             <input type="number" name="page" min="1" max="<%= totalPages %>" value="<%= currentPage %>" class="jump-input" required>
-            <button type="submit" class="btn">Đến</button>
+            <button type="submit" class="btn" style="padding: 6px 12px; font-size: 18px;">Đi</button>
           </form>
         </div>
       <% } %>
     <% } %>
   </div>
 
-  <!-- MODAL SUA TRUYEN -->
-  <div id="editModal" class="modal-overlay">
-    <div class="modal-content">
-      <h3 style="margin-top: 0; color: var(--title-color);">Sửa Thông Tin Truyện</h3>
-      <form action="/admin/update" method="POST">
-        <input type="hidden" id="modalOldBookId" name="oldBookId">
-
-        <div class="form-group">
-          <label>Mật khẩu Admin:</label>
-          <input type="password" name="adminPassword" required>
-        </div>
-
-        <div class="form-group">
-          <label>Tên truyện hiển thị mới:</label>
-          <input type="text" id="modalDisplayTitle" name="newDisplayTitle" required>
-        </div>
-
-        <div class="form-group">
-          <label>Mã truyện (Slug) mới:</label>
-          <input type="text" id="modalBookId" name="newBookId" placeholder="Để trống nếu muốn tự sinh theo tên">
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
-          <button type="button" class="btn" onclick="closeEditModal()">Hủy</button>
-          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
+  <!-- JavaScript xử lý Đóng/Mở & Submit form sửa trực tiếp -->
   <script>
-    // Quản lý Đổi Theme
-    function updateBtnText(theme) {
-      document.getElementById('themeBtn').innerText = theme === 'dark' ? '☀️ Sáng' : '🌙 Tối';
+    // Xử lý đóng mở chức năng (Accordion)
+    var coll = document.getElementsByClassName("collapsible");
+    for (var i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
     }
 
-    function toggleTheme() {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateBtnText(newTheme);
-    }
-
-    // Điều hướng Chức năng
-    function showLobby() {
-      document.getElementById('lobbyMenu').style.display = 'block';
-      document.getElementById('uploadPanel').classList.remove('active');
-      document.getElementById('listPanel').classList.remove('active');
-      window.history.pushState({}, '', '/admin');
-    }
-
-    function openPanel(panelId) {
-      document.getElementById('lobbyMenu').style.display = 'none';
-      document.getElementById('uploadPanel').classList.remove('active');
-      document.getElementById('listPanel').classList.remove('active');
-      
-      document.getElementById(panelId).classList.add('active');
-    }
-
-    function goToAdminPage(page) {
-      window.location.href = `/admin?panel=listPanel&page=${page}`;
-    }
-
-    // Chọn tất cả Checkbox
-    function toggleSelectAll(source) {
-      const checkboxes = document.querySelectorAll('.book-checkbox');
-      checkboxes.forEach(cb => cb.checked = source.checked);
-    }
-
-    // Quản lý Modal Chỉnh Sửa (Truyền qua dataset để tránh lỗi EJS)
-    function openEditModalFromBtn(btn) {
-      const id = btn.getAttribute('data-id');
-      const title = btn.getAttribute('data-title');
-      
-      document.getElementById('modalOldBookId').value = id;
-      document.getElementById('modalDisplayTitle').value = title;
-      document.getElementById('modalBookId').value = id;
-      document.getElementById('editModal').style.display = 'flex';
-    }
-
-    function closeEditModal() {
-      document.getElementById('editModal').style.display = 'none';
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      updateBtnText(currentTheme);
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const activePanel = urlParams.get('panel');
-      
-      if (activePanel && document.getElementById(activePanel)) {
-        openPanel(activePanel);
+    // Ẩn/Hiện hàng sửa truyện
+    function toggleEditRow(bookId) {
+      var row = document.getElementById("edit-row-" + bookId);
+      if (row.style.display === "none" || row.style.display === "") {
+        row.style.display = "table-row";
+      } else {
+        row.style.display = "none";
       }
-    });
+    }
+
+    // Gửi form cập nhật dữ liệu
+    function submitUpdate(bookId) {
+      var newTitle = document.getElementById("title-" + bookId).value;
+      var newSlug = document.getElementById("slug-" + bookId).value;
+      var password = document.getElementById("pass-" + bookId).value;
+
+      if (!newTitle) {
+        alert("Vui lòng nhập Tên hiển thị mới!");
+        return;
+      }
+      if (!password) {
+        alert("Vui lòng nhập Mật khẩu Admin!");
+        return;
+      }
+
+      document.getElementById("formOldBookId").value = bookId;
+      document.getElementById("formNewDisplayTitle").value = newTitle;
+      document.getElementById("formNewBookId").value = newSlug;
+      document.getElementById("formAdminPassword").value = password;
+
+      document.getElementById("hiddenUpdateForm").submit();
+    }
   </script>
 
 </body>

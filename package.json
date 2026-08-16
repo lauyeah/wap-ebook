@@ -6,10 +6,11 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "ejs": "^3.1.10",
-    "multer": "^1.4.5-lts.1",
     "@supabase/supabase-js": "^2.45.0",
-    "dotenv": "^16.4.5"
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
   }
 }
