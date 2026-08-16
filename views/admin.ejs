@@ -58,10 +58,10 @@
     <% } else { %>
       
       <!-- FORM XÓA TRUYỆN -->
-      <form action="/admin/delete-multiple" method="POST" onsubmit="return confirmDelete();">
+      <form id="deleteForm" action="/admin/delete-multiple" method="POST">
         <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
           <input type="password" name="adminPassword" id="deleteAdminPassword" placeholder="MK Admin để xóa" style="width: 180px; font-size: 18px;" required>
-          <button type="submit" class="btn btn-danger">Xóa các mục đã chọn</button>
+          <button type="button" class="btn btn-danger" onclick="executeDelete()">Xóa các mục đã chọn</button>
         </div>
 
         <table>
@@ -89,14 +89,14 @@
                 </td>
               </tr>
 
-              <!-- Hàng ẩn để SỬA thông tin (đã đưa ra khỏi phụ thuộc của Form Xóa) -->
+              <!-- Hàng ẩn để SỬA thông tin -->
               <tr id="edit-row-<%= book.id %>" style="display: none; background: rgba(255, 255, 255, 0.05);">
                 <td colspan="4" style="padding: 12px 15px;">
                   <div style="font-weight: bold; margin-bottom: 8px; color: #f57c00;">[ Chỉnh sửa: <%= book.title %> ]</div>
                   
                   <div style="margin-bottom: 8px;">
                     <label style="font-size: 16px; margin-bottom: 2px;">Tên hiển thị mới:</label>
-                    <input type="text" id="title-<%= book.id %>" value="<%= book.title %>" style="width: 95%; font-size: 18px; padding: 6px;" required>
+                    <input type="text" id="title-<%= book.id %>" value="<%= book.title %>" style="width: 95%; font-size: 18px; padding: 6px;">
                   </div>
 
                   <div style="margin-bottom: 8px;">
@@ -106,7 +106,7 @@
 
                   <div style="margin-bottom: 8px;">
                     <label style="font-size: 16px; margin-bottom: 2px;">Mật khẩu Admin:</label>
-                    <input type="password" id="pass-<%= book.id %>" placeholder="Nhập MK Admin để lưu" style="width: 95%; font-size: 18px; padding: 6px;" required>
+                    <input type="password" id="pass-<%= book.id %>" placeholder="Nhập MK Admin để lưu" style="width: 95%; font-size: 18px; padding: 6px;">
                   </div>
 
                   <div style="margin-top: 10px;">
@@ -167,14 +167,23 @@
       });
     }
 
-    // Kiểm tra trước khi xóa
-    function confirmDelete() {
+    // Xử lý Xóa bằng JavaScript trực tiếp
+    function executeDelete() {
+      var password = document.getElementById("deleteAdminPassword").value;
+      if (!password) {
+        alert("Vui lòng nhập Mật khẩu Admin để xóa!");
+        return;
+      }
+
       var checkboxes = document.querySelectorAll('.cb:checked');
       if (checkboxes.length === 0) {
-        alert('Vui lòng chọn ít nhất một truyện để xóa!');
-        return false;
+        alert("Vui lòng tích chọn ít nhất 1 truyện để xóa!");
+        return;
       }
-      return confirm('Xác nhận xóa ' + checkboxes.length + ' truyện đã chọn?');
+
+      if (confirm("Xác nhận xóa " + checkboxes.length + " truyện đã chọn?")) {
+        document.getElementById("deleteForm").submit();
+      }
     }
 
     // Toggle hiển thị form sửa
